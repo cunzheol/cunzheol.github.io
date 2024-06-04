@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="123456789101112int main()&#123;	int n&#x3D;9;    float *pFloat &#x3D;(float*)&amp;n;    printf(&quot;n的值为:%d\n&quot;,n);    printf(&quot;*pFloat的值为:%f\n&quot;,*pFloat);        *pFloat&#x3D;9.0;    printf(&quot;num的值">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浮点型数据在内存中的存储">
+<meta property="og:url" content="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/index.html">
+<meta property="og:site_name" content="存折">
+<meta property="og:description" content="123456789101112int main()&#123;	int n&#x3D;9;    float *pFloat &#x3D;(float*)&amp;n;    printf(&quot;n的值为:%d\n&quot;,n);    printf(&quot;*pFloat的值为:%f\n&quot;,*pFloat);        *pFloat&#x3D;9.0;    printf(&quot;num的值">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/print.png">
+<meta property="og:image" content="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/32.png">
+<meta property="og:image" content="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/64.png">
+<meta property="og:image" content="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/print.png">
+<meta property="article:published_time" content="2024-06-03T13:58:00.000Z">
+<meta property="article:modified_time" content="2024-06-04T00:34:23.859Z">
+<meta property="article:author" content="存折">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/print.png">
+
+<link rel="canonical" href="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>浮点型数据在内存中的存储 | 存折</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="存折" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">存折</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="存折">
+      <meta itemprop="description" content="让我们一起来维护它吧">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="存折">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          浮点型数据在内存中的存储
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-03 21:58:00" itemprop="dateCreated datePublished" datetime="2024-06-03T21:58:00+08:00">2024-06-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-06-04 08:34:23" itemprop="dateModified" datetime="2024-06-04T08:34:23+08:00">2024-06-04</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> n=<span class="number">9</span>;</span><br><span class="line">    <span class="type">float</span> *pFloat =(<span class="type">float</span>*)&amp;n;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;n的值为:%d\n&quot;</span>,n);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*pFloat的值为:%f\n&quot;</span>,*pFloat);</span><br><span class="line">    </span><br><span class="line">    *pFloat=<span class="number">9.0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;num的值为:%d\n&quot;</span>,n);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*pFloat的值为:%f\n&quot;</span>,*pFloat);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>思考下这段代码输出的值是什么？</p>
+<img src="/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/print.png" class title="This is an example image">
+
+<p>可能你会感到好奇：</p>
+<p>我明明&amp;n后强转成了float类型，为什么还会输出0.000000呢？</p>
+<p>为什么* pFloat&#x3D;9.0，以%d的形式输出会得到这么大的一个数呢？</p>
+<p>别急，我慢慢解释。</p>
+<p>首先我们需要知道浮点型的数据在内存中是如何存储的。</p>
+<p>浮点型的数据是根据国际标准“IEEE 754”来存储的，标准规定：每个浮点数V&#x3D;(-1)^S* M*2^E</p>
+<p>当S&#x3D;0时，浮点数为正数</p>
+<p>当S&#x3D;1时，浮点数为负数</p>
+<p>那么M与E又代表什么意思呢？</p>
+<p>假设我们有一个浮点数“5.5”，把它转换成二进制的形式就是：101.1，此时它的S&#x3D;0，M&#x3D;1.01，E&#x3D;2。</p>
+<p>（就好比科学计数法，5500&#x3D;5.5*10^3，只不过浮点型V&#x3D;(-1)^S * M * 2^E是把科学计数法的10换成了2。）</p>
+<p>回到正题，M就是将浮点数转换成二进制再转换成类似于科学计数法的形式时，5.5的部分，E就是小数点的位移量，</p>
+<p>同时，计算机又根据32为浮点型(float)与64位浮点型(double)将存储方式分类两类：</p>
+<p>32位浮点型：第一位位符号位（s）,往后8 bit表示E，剩下23 Bit表示M</p>
+<img src="/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/32.png" class title="This is an example image">
+
+<p>64位浮点型：第一位表示符号位,往后11 bit表示E，剩下52 bit表示M。</p>
+<img src="/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/64.png" class title="This is an example image">
+
+<p><strong>关于M:</strong></p>
+<p>M，的取值范围：M大于等于1，小于2。</p>
+<p>也就是说，M是默认存在一个1的，所以，为了节省一位有效数字，我们在把M存储到内存中时，只会存储小数部分，当要使用该浮点型的数时，提取M，只需要在前面加上一个1就行。假设是一个32位的浮点数，以这样的方式存储，原本只能存放23位有效数字，现在就能存放24位有效数字了（存放到内存中的小数部分（23位）与默认的1，一共24位）</p>
+<p><strong>关于E:</strong></p>
+<p>上面我们说到，V的公式类似于科学计数法，但是在科学计数法里，E的值可以为负数；但是在V公式中，E是一个无符号整型，它只能为正数，所以，为了防止出现负数的情况，在计算机把E存入到内存中时，会让E加上一个中间值。</p>
+<p>32位的浮点型中间值为127</p>
+<p>64位的浮点型中间值为1023</p>
+<p>比如上面提到的V&#x3D;5.5&#x3D;101.1&#x3D;(-1)^0* M *2^2;</p>
+<p>E&#x3D;2，加上中间值&#x3D;129，再转换成二进制形式：1000 0001。</p>
+<p>如果要取出来，也很简单，让E减去中间值就行了。</p>
+<p>但是在提取E时，会出现三种情况：</p>
+<ul>
+<li>E全为0的情况</li>
+<li>E全为1的情况</li>
+<li>E不是全为1也不是全为0的情况（正常情况）</li>
+</ul>
+<p><strong>E全为0的情况</strong>：（假设是32位浮点数）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s: <span class="number">0</span>  E: <span class="number">00000000</span>  M: <span class="number">00000000000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>此时E是存储在内存中的，E&#x3D;0，我们知道E存储到内存中时要加上中间值，前面已经知道了32位浮点数的中间值是127，当E为多少时，加上中间值会等于0？答案是：-127</p>
+<p>所以 : v&#x3D;(-1)^S* M*2^E，此时不管S与M等于多少，最终V都是一个接近于0的数。</p>
+<p><strong>E全为1的情况</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s: <span class="number">0</span>  E: <span class="number">11111111</span>  M: <span class="number">00000000000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>此时E是存储在内存中的，E转换成十进制是255，我们知道E存储到内存中时要加上中间值，前面已经知道了32位浮点数的中间值是127，当E为多少时，加上中间值会等于255？，答案是：128。</p>
+<p>所以 : v&#x3D;(-1)^S* M*2^E，此时不管S与M等于多少，最终V都是一个非常大的数。</p>
+<p><strong>E不是全为1也不是全为0的情况（正常情况）</strong>：</p>
+<p>正常情况就不赘述了。当你看完了前面的内容，这种情况也就能自己去推算了。</p>
+<p>现在我们在回到前面的问题：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> n=<span class="number">9</span>;</span><br><span class="line">    <span class="type">float</span> *pFloat =(<span class="type">float</span>*)&amp;n;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;n的值为:%d\n&quot;</span>,n);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*pFloat的值为:%f\n&quot;</span>,*pFloat);</span><br><span class="line">    </span><br><span class="line">    *pFloat=<span class="number">9.0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;num的值为:%d\n&quot;</span>,n);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*pFloat的值为:%f\n&quot;</span>,*pFloat);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;思考下这段代码输出的值是什么？</span><br></pre></td></tr></table></figure>
+
+<p>当面把&amp;强转成浮点型时，9&#x3D;(-1)^S* M *2^E;</p>
+<p>S&#x3D;0、E&#x3D;00000000、M&#x3D;00000000000000000001001。</p>
+<p>所以最后输出：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;*pFloat的值为:%f\n&quot;</span>,*pFloat);</span><br></pre></td></tr></table></figure>
+
+<p>值为：0.000000</p>
+<p>在当我们给*pFlota赋值9.0时；</p>
+<p>9.0&#x3D;(-1)^S* M* 2^E；</p>
+<p>S&#x3D;0、M&#x3D;001、E&#x3D;3，</p>
+<p>转换成二进制:0 10000010 00100000000000000000000，再转换成十进制就等于：1091567616</p>
+<img src="/year/06/03/%E6%B5%AE%E7%82%B9%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8/print.png" class title="This is an example image">
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/year/06/02/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" rel="prev" title="文件操作">
+      <i class="fa fa-chevron-left"></i> 文件操作
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC81OTg4MS8zNjM0Mw=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="存折"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">存折</p>
+  <div class="site-description" itemprop="description">让我们一起来维护它吧</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024-6-1 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">存折</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>
